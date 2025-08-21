@@ -1,11 +1,14 @@
 import React from 'react';
-import { Hello } from './Hello.jsx';
-import { Info } from './Info.jsx';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Contact from './Contact.jsx';
 
-export const App = () => (
-  <div>
-    <h1>Welcome to Meteor!</h1>
-    <Hello/>
-    <Info/>
-  </div>
-);
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </Router>
+  );
+}

@@ -1,21 +1,32 @@
 import { WebApp } from "meteor/webapp";
 import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 const app = express();
 
-app.use(cors());
-app.use(bodyParser.json());
+const meteorRoutes = [
+  // "/",
+  "/contact",
+];
 
-// Example routes
-app.get("/api/hello", (req, res) => {
-  res.json({ message: "Hello from Express inside Meteor!" });
+const laravelProxy = createProxyMiddleware({
+  target: "http://lupnr.loc",
+  changeOrigin: true,
+  ws: true,
+  headers: {
+    Origin: "http://lupnr.loc",
+    Referer: "http://lupnr.loc",
+    Host: "lupnr.loc",
+    Source: "Meteor",
+  },
 });
 
-app.post("/api/data", (req, res) => {
-  res.json({ received: req.body });
+// Middleware
+app.use((req, res, next) => {
+  if (meteorRoutes.includes(req.path)) {
+    return next(); // Meteor serves React
+  }
+  return laravelProxy(req, res, next); // everything else to Laravel
 });
 
-// Attach Express to Meteor’s HTTP server (no app.listen!)
 WebApp.connectHandlers.use(app);
